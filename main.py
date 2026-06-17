@@ -1,3 +1,10 @@
+#importation de l'objet cnx dans main.py
+import statistics as stats
+
+import pandas as pd
+# pour eviter le push des mdp sur git
+from dotenv import load_dotenv
+import os
 import pandas as pd
 from ConnexionBdd import cnx
 
@@ -14,19 +21,42 @@ df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
 #-------- LECTURE SQL---------------------------------
 
 #connexion bdd
-bdd = cnx
+import mysql.connector
+
+
+load_dotenv()
+
+
+
+# connexion bdd clinique
+cnx = mysql.connector.connect(
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
+)
+
 
 print("connexion réussi !")
 
 #création d'une requête pour tester la connexion
 cur = cnx.cursor()
-query = "select * from appareil"
+query = "SELECT * FROM evenement_respiratoire where id_nuit = 1"
 
 #éxecution de la requête
 cur.execute(query)
 result = cur.fetchall()
 for f in result:
     print(f)
+
+
+
+
+
+
+
+
+
 
 
 #-----------------------------------------------------
@@ -65,6 +95,8 @@ spo2_mediane = round(df.loc[:,'spo2'].median(),1)
 print(f"spo2_min :{spo2_min}")
 print(f"spo2_moy :{spo2_moy}")
 print(f"spo2_mediane :{spo2_mediane}")
+
+
 
 # Compter le nombre de secondes où spo2 < 90 - Chaque ligne 10 secondes 
 nbr_secondes = len(df.loc[df['spo2'] < 90]) * 10

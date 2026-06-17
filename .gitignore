@@ -1,2 +1,4 @@
 datalake.db
-ConnexionBdd.py
+
+__pycache__/
+.env
