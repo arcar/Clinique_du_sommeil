@@ -5,7 +5,7 @@ import statistics as stats
 cnx = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="votre_mdp",
+    password="ton_mdp",
     database="clinique"
 )
 
