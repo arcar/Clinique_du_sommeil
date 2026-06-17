@@ -66,6 +66,20 @@ print(f"spo2_min :{spo2_min}")
 print(f"spo2_moy :{spo2_moy}")
 print(f"spo2_mediane :{spo2_mediane}")
 
-# Compter le nombre de secondes où spo2 < 90
-nbr_secondes = len(df.loc[df['spo2'] < 90])
+# Compter le nombre de secondes où spo2 < 90 - Chaque ligne 10 secondes 
+nbr_secondes = len(df.loc[df['spo2'] < 90]) * 10
 print(f"le nombre de secondes où spo2 < 90 : {nbr_secondes}")
+
+# Calcul du nombre de ronflement fort 
+df["ronflements_db"] = pd.to_numeric(df["ronflements_db"],errors="coerce")
+nbr_ronflements_forts = len(df.loc[df["ronflements_db"]>70])
+print(f"Nombre de ronflements forts : { nbr_ronflements_forts}")
+
+# Calcul de la position dominante
+
+position_dominante = df['position'].value_counts()
+
+# label de  max value
+position_dominante = position_dominante[position_dominante == max(position_dominante)].index.tolist()[0]
+
+print(position_dominante)
