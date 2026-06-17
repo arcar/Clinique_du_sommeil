@@ -1,5 +1,17 @@
-#importation de l'objet cnx dans main.py
+import pandas as pd
 from ConnexionBdd import cnx
+
+
+#-----------------------------------------------------
+#-------- LECTURE FICHIER CSV-------------------------
+
+fileToRead = "./raw/signal-psg-patient-2-nuit-2.csv"
+
+# Lire le CSV capteur patient
+df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
+
+#-----------------------------------------------------
+#-------- LECTURE SQL---------------------------------
 
 #connexion bdd
 bdd = cnx
@@ -15,12 +27,10 @@ cur.execute(query)
 result = cur.fetchall()
 for f in result:
     print(f)
-import pandas as pd
 
-fileToRead = "./raw/signal-psg-patient-2-nuit-2.csv"
 
-# Lire le CSV capteur patient
-df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
+#-----------------------------------------------------
+#-------- CALCUL INDICATEURS -------------------------
 
 # Calcul des décibels max depuis le csv
 decibels_max = df['ronflements_db'].max()
@@ -41,10 +51,13 @@ df["flag_evenement"] = df["flag_evenement"].astype(str).str.strip()
 
 
 df["spo2"] = pd.to_numeric(df["spo2"],errors="coerce")
+
 # Calcul Min spo2
 spo2_min = min(df["spo2"])
+
 # Calcul Moyenne spo2
 spo2_moy = df.loc[:,'spo2'].mean()
+
 # Calcul médiane spo2
 spo2_mediane = df.loc[:,'spo2'].median()
 
