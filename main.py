@@ -1,26 +1,56 @@
-#importation de l'objet cnx dans main.py
-from ConnexionBdd import cnx
+import pandas as pd
+import mysql.connector
+from dotenv import load_dotenv
+import os
+import pandas as pd
 
-#connexion bdd
-bdd = cnx
+
+
+#-----------------------------------------------------
+#-------- LECTURE FICHIER CSV-------------------------
+
+fileToRead = "./raw/signal-psg-patient-2-nuit-2.csv"
+
+# Lire le CSV capteur patient
+df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
+
+#-----------------------------------------------------
+#-------- LECTURE SQL---------------------------------
+
+load_dotenv()
+
+# connexion bdd clinique
+cnx = mysql.connector.connect(
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
+)
 
 print("connexion réussi !")
 
 #création d'une requête pour tester la connexion
 cur = cnx.cursor()
-query = "select * from appareil"
+query = "SELECT * FROM evenement_respiratoire where id_nuit = 1"
 
 #éxecution de la requête
 cur.execute(query)
 result = cur.fetchall()
 for f in result:
     print(f)
-import pandas as pd
 
-fileToRead = "./raw/signal-psg-patient-2-nuit-2.csv"
 
-# Lire le CSV capteur patient
-df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
+
+
+
+
+
+
+
+
+
+#-----------------------------------------------------
+#-------- CALCUL INDICATEURS -------------------------
 
 # Calcul des décibels max depuis le csv
 decibels_max = df['ronflements_db'].max()
@@ -41,14 +71,51 @@ df["flag_evenement"] = df["flag_evenement"].astype(str).str.strip()
 
 
 df["spo2"] = pd.to_numeric(df["spo2"],errors="coerce")
+
 # Calcul Min spo2
 spo2_min = min(df["spo2"])
+
 # Calcul Moyenne spo2
-spo2_moy = df.loc[:,'spo2'].mean()
+spo2_moy = round(df.loc[:,'spo2'].mean(),1)
+
 # Calcul médiane spo2
-spo2_mediane = df.loc[:,'spo2'].median()
+spo2_mediane = round(df.loc[:,'spo2'].median(),1)
 
 
 print(f"spo2_min :{spo2_min}")
 print(f"spo2_moy :{spo2_moy}")
 print(f"spo2_mediane :{spo2_mediane}")
+
+
+
+# Compter le nombre de secondes où spo2 < 90 - Chaque ligne 10 secondes 
+nbr_secondes = len(df.loc[df['spo2'] < 90]) * 10
+print(f"le nombre de secondes où spo2 < 90 : {nbr_secondes}")
+
+# Calcul du nombre de ronflement fort 
+df["ronflements_db"] = pd.to_numeric(df["ronflements_db"],errors="coerce")
+nbr_ronflements_forts = len(df.loc[df["ronflements_db"]>70])
+print(f"Nombre de ronflements forts : { nbr_ronflements_forts}")
+
+# Calcul de la position dominante
+
+position_dominante = df['position'].value_counts()
+
+# label de  max value
+position_dominante = position_dominante[position_dominante == max(position_dominante)].index.tolist()[0]
+
+print(position_dominante)
+
+
+
+#-----------------------------------------------------
+#-------- EXTRAPOLATION RESULTATS --------------------
+
+# new_nb_apnees = 
+# new_nb_hypopnees =
+# new_nb_rera =
+# new_nb_microreveils =
+new_duree_hypoxie = round((nbr_secondes*7)/60, 1)
+new_nb_ronflements_forts = nbr_ronflements_forts*7
+
+print(new_nb_ronflements_forts)
