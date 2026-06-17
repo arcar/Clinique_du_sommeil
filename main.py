@@ -1,21 +1,48 @@
 #importation de l'objet cnx dans main.py
-from ConnexionBdd import cnx
+import statistics as stats
+
+import pandas as pd
+# pour eviter le push des mdp sur git
+from dotenv import load_dotenv
+import os
 
 #connexion bdd
-bdd = cnx
+import mysql.connector
+
+
+load_dotenv()
+
+
+
+# connexion bdd clinique
+cnx = mysql.connector.connect(
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
+)
+
 
 print("connexion réussi !")
 
 #création d'une requête pour tester la connexion
 cur = cnx.cursor()
-query = "select * from appareil"
+query = "SELECT * FROM evenement_respiratoire where id_nuit = 1"
 
 #éxecution de la requête
 cur.execute(query)
 result = cur.fetchall()
 for f in result:
     print(f)
-import pandas as pd
+
+
+
+
+
+
+
+
+
 
 fileToRead = "./raw/signal-psg-patient-2-nuit-2.csv"
 
@@ -52,3 +79,6 @@ spo2_mediane = df.loc[:,'spo2'].median()
 print(f"spo2_min :{spo2_min}")
 print(f"spo2_moy :{spo2_moy}")
 print(f"spo2_mediane :{spo2_mediane}")
+
+
+
