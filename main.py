@@ -79,7 +79,15 @@ print(f"Nombre de ronflements forts : { nbr_ronflements_forts}")
 
 position_dominante = df['position'].value_counts()
 
-# label de  max value
+# label de max value
 position_dominante = position_dominante[position_dominante == max(position_dominante)].index.tolist()[0]
 
-print(position_dominante)
+print(f"Position dominante : {position_dominante}")
+
+nb_doublons = df.duplicated().sum()
+
+print(df)
+
+
+
+#df.to_csv("./raw/traite_signal-psg-patient-2-nuit-2.csv.csv", sep=",", index=False, encoding="utf-8-sig")
