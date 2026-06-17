@@ -1,12 +1,9 @@
-#importation de l'objet cnx dans main.py
-import statistics as stats
-
 import pandas as pd
-# pour eviter le push des mdp sur git
+import mysql.connector
 from dotenv import load_dotenv
 import os
 import pandas as pd
-from ConnexionBdd import cnx
+
 
 
 #-----------------------------------------------------
@@ -20,13 +17,7 @@ df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
 #-----------------------------------------------------
 #-------- LECTURE SQL---------------------------------
 
-#connexion bdd
-import mysql.connector
-
-
 load_dotenv()
-
-
 
 # connexion bdd clinique
 cnx = mysql.connector.connect(
@@ -35,7 +26,6 @@ cnx = mysql.connector.connect(
     password=os.getenv("DB_PASSWORD"),
     database=os.getenv("DB_NAME")
 )
-
 
 print("connexion réussi !")
 
