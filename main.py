@@ -83,3 +83,17 @@ position_dominante = df['position'].value_counts()
 position_dominante = position_dominante[position_dominante == max(position_dominante)].index.tolist()[0]
 
 print(position_dominante)
+
+
+
+#-----------------------------------------------------
+#-------- EXTRAPOLATION RESULTATS --------------------
+
+# new_nb_apnees = 
+# new_nb_hypopnees =
+# new_nb_rera =
+# new_nb_microreveils =
+new_duree_hypoxie = round((nbr_secondes*7)/60, 1)
+new_nb_ronflements_forts = nbr_ronflements_forts*7
+
+print(new_nb_ronflements_forts)
