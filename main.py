@@ -56,12 +56,16 @@ df["spo2"] = pd.to_numeric(df["spo2"],errors="coerce")
 spo2_min = min(df["spo2"])
 
 # Calcul Moyenne spo2
-spo2_moy = df.loc[:,'spo2'].mean()
+spo2_moy = round(df.loc[:,'spo2'].mean(),1)
 
 # Calcul médiane spo2
-spo2_mediane = df.loc[:,'spo2'].median()
+spo2_mediane = round(df.loc[:,'spo2'].median(),1)
 
 
 print(f"spo2_min :{spo2_min}")
 print(f"spo2_moy :{spo2_moy}")
 print(f"spo2_mediane :{spo2_mediane}")
+
+# Compter le nombre de secondes où spo2 < 90
+nbr_secondes = len(df.loc[df['spo2'] < 90])
+print(f"le nombre de secondes où spo2 < 90 : {nbr_secondes}")
