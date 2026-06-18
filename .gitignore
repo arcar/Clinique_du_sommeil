@@ -3,5 +3,5 @@ datalake.db
 __pycache__/
 .env
 
-nuit/
+nuits/
 raw/traite/

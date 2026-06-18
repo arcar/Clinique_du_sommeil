@@ -131,23 +131,17 @@ new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
 
 
-<<<<<<< HEAD
+
 # # Charger les résultats_nuit dans SQL
-# cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
-# cnx.commit()
-=======
-#Charger les résultats_nuit dans SQL
 cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
 cnx.commit()
-
->>>>>>> 9f5d27f255264e5fa210fd77f737d9325e18113a
 
 
 #-----------------------------------------------------
 #-------- COURBES --------------- --------------------
 
 # Dossier de destination
-dossier = Path(f"nuit/{id_nuit}")
+dossier = Path(f"nuits/{id_nuit}")
 
 # Création du dossier et des sous-dossiers si nécessaire
 dossier.mkdir(parents=True, exist_ok=True)
@@ -162,11 +156,7 @@ with open("./raw/"+fichier, encoding="utf-8") as f:
         debit.append(float(row["debit_nasal_pct"]))
         ronflement_db.append(float(row["ronflements_db"]))
 
-<<<<<<< HEAD
-print(ronflement_db)
 
-=======
->>>>>>> 9f5d27f255264e5fa210fd77f737d9325e18113a
 heures = list(range(len(debit)))
 plt.plot(heures, debit, marker='o')
 plt.xlabel("/10 secondes")
@@ -184,9 +174,6 @@ plt.ylabel("Ronflement (dB)")
 plt.title("Évolution du ronflement sur une heure par tranche de 10 secondes")
 plt.grid(True)
 plt.savefig(dossier / f"ronflement_db_{id_nuit}.png")
-<<<<<<< HEAD
-plt.savefig(dossier / f"ronflement_db_{id_nuit}.pdf")
-=======
 plt.savefig(dossier / f"ronflement_db_{id_nuit}.pdf")
 
 
@@ -247,6 +234,3 @@ with open(dossier / f"rapport_medical_{id_nuit}.txt", "w", encoding="utf-8") as 
     f.write(f" IAH:{iah}\n\n")
     
     print(f"Rapport Medical généré dans 'rapport_medical.txt'.")
-
-    
->>>>>>> 9f5d27f255264e5fa210fd77f737d9325e18113a
