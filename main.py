@@ -2,6 +2,9 @@ import pandas as pd
 import mysql.connector
 from dotenv import load_dotenv
 import os
+import matplotlib.pyplot as plt
+import csv
+from pathlib import Path
 
 
 
@@ -191,3 +194,31 @@ with open("rapport_medical.txt", "w", encoding="utf-8") as f:
     print(f"Rapport Medical généré dans 'rapport_medical.txt'.")
 
     
+cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
+cnx.commit()
+
+
+#-----------------------------------------------------
+#-------- COURBES --------------- --------------------
+
+# Dossier de destination
+dossier = Path(f"nuit/{id_nuit}")
+
+# Création du dossier et des sous-dossiers si nécessaire
+dossier.mkdir(parents=True, exist_ok=True)
+
+# Générer une courbe PNG et PDF pour debit nasal
+# Objectif : visualiser les données.
+debit = []
+with open("./raw/"+fichier, encoding="utf-8") as f:
+    reader = csv.DictReader(f, delimiter=',')
+    for row in reader:
+        debit.append(float(row["debit_nasal_pct"]))
+heures = list(range(len(debit)))
+plt.plot(heures, debit, marker='o')
+plt.xlabel("/10 secondes")
+plt.ylabel("Débit nasal")
+plt.title("Évolution du débit nasal sur une heure par tranche de 10 secondes")
+plt.grid(True)
+plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.png")
+plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.pdf")
