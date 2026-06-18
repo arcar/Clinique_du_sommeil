@@ -6,13 +6,20 @@ import pandas as pd
 
 
 
+
 #-----------------------------------------------------
 #-------- LECTURE FICHIER CSV-------------------------
 
-fileToRead = "./raw/signal-psg-patient-2-nuit-2.csv"
+# Pour choisir le csv a charger en fonction de l'id_nuit
+id_nuit = 2
 
-# Lire le CSV capteur patient
-df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
+for fichier in os.listdir("./raw/"):
+    if fichier.endswith(f"-{id_nuit}.csv"):
+        df = pd.read_csv("./raw/"+fichier)
+        break
+else :
+    print("Aucun fichier trouvé")
+
 
 #-----------------------------------------------------
 #-------- LECTURE SQL---------------------------------
@@ -27,7 +34,7 @@ cnx = mysql.connector.connect(
     database=os.getenv("DB_NAME")
 )
 
-print("connexion réussi !")
+print("Connexion réussie !")
 
 #création d'une requête pour tester la connexion
 cur = cnx.cursor()
