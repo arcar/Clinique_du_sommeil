@@ -1,1 +1,4 @@
 datalake.db
+
+__pycache__/
+.env
