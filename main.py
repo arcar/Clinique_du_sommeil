@@ -62,7 +62,7 @@ result = cur.fetchall()
 decibels_max = df['ronflements_db'].max()
 
 # Calcul de la moyenne des décibels depuis le csv
-decibels_moy = df['ronflements_db'].mean()
+decibels_moy = round(df['ronflements_db'].mean(),1)
 
 # Suppression d'éventuelles espaces sur les colonnes
 df["timestamp_sec"] = df["timestamp_sec"].astype(str).str.strip()
@@ -131,71 +131,10 @@ new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
 
 
-# Charger les résultats_nuit dans SQL
-# cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
-# cnx.commit()
-
-#-----------------------------------------------------
-#-------- Rapport Medical --------------------
-
-cur = cnx.cursor()
-
-requete = """
-SELECT nb_apnees, nb_hypopnees, nb_rera,iah
-FROM resultat_nuit
-WHERE id_nuit = %s
-"""
-
-cur.execute(requete, (id_nuit,))
-result = cur.fetchone()
-
-if result:
-    nb_apnees = result[0]
-    nb_hypopnees = result[1]
-    nb_rera = result[2]
-    iah = result[3]
-else:
-    nb_apnees = 0
-    nb_hypopnees = 0
-    nb_rera = 0
-    iah = 0
-
-
-with open("rapport_medical.txt", "w", encoding="utf-8") as f:
-    f.write("=== Rapport médical pour le Medecin ===\n\n")
-    
-    f.write("============================================\n")
-    f.write(f"=== Nuit : {id_nuit} ===\n\n")
-    f.write("Spo2 min/moy/max: \n\n")
-    f.write(f"minimum :{spo2_min}\n\n")
-    f.write(f"moyen :{spo2_moy}\n\n")
-    f.write(f"mediane :{spo2_mediane}\n\n")
-    f.write("============================================\n\n")
-    f.write("Ronflement fort (>70dB): \n\n")
-    f.write(f"{new_nb_ronflements_forts}\n\n")
-    f.write("intensité des ronflements : \n\n")
-    f.write(f" MAX : {decibels_max} \n\n")
-    f.write(f" MOYEN : {decibels_moy}n\n")
-    f.write("============================================\n\n")
-    f.write("Duree Hypoxie : \n\n")
-    f.write(f"{new_duree_hypoxie} min\n\n")
-    f.write("============================================\n\n")
-    f.write("Position Dominante : \n\n")
-    f.write(f" {position_dominante}\n\n")
-    f.write("============================================\n\n")
-    f.write("Nombre d’apnées / hypopnées / RERA : \n\n")
-    f.write(f" apnées :{nb_apnees}\n\n")
-    f.write(f" hypopnées :{nb_hypopnees}\n\n")
-    f.write(f" RERA :{nb_rera}\n\n")
-    f.write("============================================\n\n")
-    f.write("IAH : \n\n")
-    f.write(f" IAH:{iah}\n\n")
-    
-    print(f"Rapport Medical généré dans 'rapport_medical.txt'.")
-
-    
+#Charger les résultats_nuit dans SQL
 cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
 cnx.commit()
+
 
 
 #-----------------------------------------------------
@@ -222,3 +161,67 @@ plt.title("Évolution du débit nasal sur une heure par tranche de 10 secondes")
 plt.grid(True)
 plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.png")
 plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.pdf")
+
+
+
+
+
+#-----------------------------------------------------
+#-------- Rapport Medical ----------------------------
+
+cur = cnx.cursor()
+
+requete = """
+SELECT nb_apnees, nb_hypopnees, nb_rera,iah
+FROM resultat_nuit
+WHERE id_nuit = %s
+"""
+
+cur.execute(requete, (id_nuit,))
+result = cur.fetchone()
+
+if result:
+    nb_apnees = result[0]
+    nb_hypopnees = result[1]
+    nb_rera = result[2]
+    iah = result[3]
+else:
+    nb_apnees = 0
+    nb_hypopnees = 0
+    nb_rera = 0
+    iah = 0
+
+
+with open(dossier / f"rapport_medical_{id_nuit}.txt", "w", encoding="utf-8") as f:
+    f.write("=== Rapport médical pour le Medecin ===\n\n")
+    
+    f.write("============================================\n")
+    f.write(f"=== Nuit : {id_nuit} ===\n\n")
+    f.write("Spo2 min/moy/max: \n\n")
+    f.write(f"minimum :{spo2_min}\n\n")
+    f.write(f"moyen :{spo2_moy}\n\n")
+    f.write(f"mediane :{spo2_mediane}\n\n")
+    f.write("============================================\n\n")
+    f.write("Ronflement fort (>70dB): \n\n")
+    f.write(f"{new_nb_ronflements_forts}\n\n")
+    f.write("intensité des ronflements : \n\n")
+    f.write(f" MAX : {decibels_max} \n\n")
+    f.write(f" MOYEN : {decibels_moy}\n\n")
+    f.write("============================================\n\n")
+    f.write("Duree Hypoxie : \n\n")
+    f.write(f"{new_duree_hypoxie} min\n\n")
+    f.write("============================================\n\n")
+    f.write("Position Dominante : \n\n")
+    f.write(f" {position_dominante}\n\n")
+    f.write("============================================\n\n")
+    f.write("Nombre d’apnées / hypopnées / RERA : \n\n")
+    f.write(f" apnées :{nb_apnees}\n\n")
+    f.write(f" hypopnées :{nb_hypopnees}\n\n")
+    f.write(f" RERA :{nb_rera}\n\n")
+    f.write("============================================\n\n")
+    f.write("IAH : \n\n")
+    f.write(f" IAH:{iah}\n\n")
+    
+    print(f"Rapport Medical généré dans 'rapport_medical.txt'.")
+
+    
