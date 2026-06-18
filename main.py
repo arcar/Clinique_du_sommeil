@@ -4,14 +4,18 @@ from dotenv import load_dotenv
 import os
 import pandas as pd
 
+#-----------------------------------------------------
+#-------- DUREE SOMMEIL MINUTES ----------------------
 
+# ICI on crée une variable pour indiquer la durée du sommeil en fonction des notes techniques
+duree_sommeil_min = 436
 
 
 #-----------------------------------------------------
 #-------- LECTURE FICHIER CSV-------------------------
 
 # Pour choisir le csv a charger en fonction de l'id_nuit
-id_nuit = 2
+id_nuit = 1
 
 for fichier in os.listdir("./raw/"):
     if fichier.endswith(f"-{id_nuit}.csv"):
@@ -45,14 +49,6 @@ cur.execute(query)
 result = cur.fetchall()
 for f in result:
     print(f)
-
-
-
-
-
-
-
-
 
 
 
@@ -122,7 +118,7 @@ print(position_dominante)
 # new_nb_hypopnees =
 # new_nb_rera =
 # new_nb_microreveils =
-new_duree_hypoxie = round((nbr_secondes*7)/60, 1)
-new_nb_ronflements_forts = nbr_ronflements_forts*7
+new_duree_hypoxie = round(((nbr_secondes/60)*duree_sommeil_min)/60, 1)
+new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 
 print(new_nb_ronflements_forts)
