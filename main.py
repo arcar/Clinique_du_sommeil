@@ -2,7 +2,6 @@ import pandas as pd
 import mysql.connector
 from dotenv import load_dotenv
 import os
-import pandas as pd
 
 
 
@@ -112,15 +111,15 @@ position_dominante = position_dominante[position_dominante == max(position_domin
 print(position_dominante)
 
 
-
 #-----------------------------------------------------
 #-------- EXTRAPOLATION RESULTATS --------------------
 
-# new_nb_apnees = 
-# new_nb_hypopnees =
-# new_nb_rera =
-# new_nb_microreveils =
 new_duree_hypoxie = round(((nbr_secondes/60)*duree_sommeil_min)/60, 1)
 new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 
 print(new_nb_ronflements_forts)
+
+
+# Charger les résultats_nuit dans SQL
+cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
+cnx.commit()
