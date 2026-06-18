@@ -1,5 +1,6 @@
 import pandas as pd
 import mysql.connector
+import sqlite3
 from dotenv import load_dotenv
 import os
 
@@ -134,3 +135,49 @@ df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",
 # Charger les résultats_nuit dans SQL
 cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
 cnx.commit()
+
+
+
+
+# Création du datalake
+
+cnx_sqlite = sqlite3.connect("datalake.db")
+cursqlite = cnx_sqlite.cursor()
+cursqlite.execute("CREATE TABLE IF NOT EXISTS raw_capteur (id_raw INTEGER PRIMARY KEY AUTOINCREMENT,id_nuit  INTEGER NOT NULL,timestamp_sec INTEGER NOT NULL,spo2 REAL,debitnasalpct REAL,effortthoraciquepct REAL,position TEXT,ronflements_db REAL,flagevenement INTEGER CHECK (flagevenement IN (0,1)))")
+cursqlite.execute("CREATE TABLE IF NOT EXISTS curated_nuit (id_curated INTEGER PRIMARY KEY AUTOINCREMENT,id_nuit INTEGER NOT NULL,spo2_min REAL,spo2_moy REAL,spo2_mediane REAL,nb_apnees INTEGER,nb_hypopnees INTEGER,nb_rera INTEGER,nb_microeveils INTEGER,dureehypoxiemin REAL,position_dominante TEXT,decibels_max REAL,decibels_moy REAL,nbronflementsforts INTEGER)")
+for _, row in df.iterrows():
+    cursqlite.execute(
+        """
+        INSERT INTO raw_capteur (
+            id_nuit,
+            timestamp_sec,
+            spo2,
+            debitnasalpct,
+            effortthoraciquepct,
+            position,
+            ronflements_db,
+            flagevenement
+        )
+        VALUES (?,?,?,?,?,?,?,?)
+        """,
+        (
+            id_nuit,
+            row["timestamp_sec"],
+            row["spo2"],
+            row["debit_nasal_pct"],
+            row["effort_thoracique_pct"],
+            row["position"],
+            row["ronflements_db"],
+            row["flag_evenement"]
+        )
+    )
+
+
+
+
+
+cursqlite.execute("INSERT INTO curated_nuit (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,nb_hypopnees,nb_rera,nb_microeveils,dureehypoxiemin,position_dominante,decibels_max,decibels_moy,nbronflementsforts) VALUES (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,nb_hypopnees,nb_rera,nb_microeveils,duree_hypoxie_min,position_dominante,decibels_max,decibels_moy,nbr_ronflements_forts)")
+cnx_sqlite.commit()
+
+
+
