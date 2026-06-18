@@ -2,6 +2,9 @@ import pandas as pd
 import mysql.connector
 from dotenv import load_dotenv
 import os
+import matplotlib.pyplot as plt
+import csv
+from pathlib import Path
 
 
 
@@ -131,6 +134,47 @@ print(new_nb_ronflements_forts)
 df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
 
 
-# Charger les résultats_nuit dans SQL
-cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
-cnx.commit()
+# # Charger les résultats_nuit dans SQL
+# cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
+# cnx.commit()
+
+
+#-----------------------------------------------------
+#-------- COURBES --------------- --------------------
+
+# Dossier de destination
+dossier = Path(f"nuit/{id_nuit}")
+
+# Création du dossier et des sous-dossiers si nécessaire
+dossier.mkdir(parents=True, exist_ok=True)
+
+# Générer une courbe PNG et PDF pour debit nasal
+# Objectif : visualiser les données.
+debit = []
+ronflement_db = []
+with open("./raw/"+fichier, encoding="utf-8") as f:
+    reader = csv.DictReader(f, delimiter=',')
+    for row in reader:
+        debit.append(float(row["debit_nasal_pct"]))
+        ronflement_db.append(float(row["ronflements_db"]))
+
+print(ronflement_db)
+
+heures = list(range(len(debit)))
+plt.plot(heures, debit, marker='o')
+plt.xlabel("/10 secondes")
+plt.ylabel("Débit nasal")
+plt.title("Évolution du débit nasal sur une heure par tranche de 10 secondes")
+plt.grid(True)
+plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.png")
+plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.pdf")
+plt.close()
+
+heures2 = list(range(len(ronflement_db)))
+plt.plot(heures2, ronflement_db, marker='o')
+plt.xlabel("/10 secondes")
+plt.ylabel("Ronflement (dB)")
+plt.title("Évolution du ronflement sur une heure par tranche de 10 secondes")
+plt.grid(True)
+plt.savefig(dossier / f"ronflement_db_{id_nuit}.png")
+plt.savefig(dossier / f"ronflement_db_{id_nuit}.pdf")
