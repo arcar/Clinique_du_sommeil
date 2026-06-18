@@ -10,6 +10,7 @@ import pandas as pd
 # ICI on crée une variable pour indiquer la durée du sommeil en fonction des notes techniques
 duree_sommeil_min = 436
 
+
 #-----------------------------------------------------
 #-------- LECTURE FICHIER CSV-------------------------
 
