@@ -105,8 +105,16 @@ print(f"Nombre de ronflements forts : { nbr_ronflements_forts}")
 
 position_dominante = df['position'].value_counts()
 
-# label de  max value
+# label de max value
 position_dominante = position_dominante[position_dominante == max(position_dominante)].index.tolist()[0]
+
+print(f"Position dominante : {position_dominante}")
+
+nb_doublons = df.duplicated().sum()
+
+print(df)
+
+
 
 print(position_dominante)
 
@@ -118,6 +126,9 @@ new_duree_hypoxie = round(((nbr_secondes/60)*duree_sommeil_min)/60, 1)
 new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 
 print(new_nb_ronflements_forts)
+
+# Copier le CSV brut dans /raw/traite/
+df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
 
 
 # Charger les résultats_nuit dans SQL
