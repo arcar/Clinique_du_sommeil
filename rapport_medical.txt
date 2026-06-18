@@ -38,15 +38,15 @@ Position Dominante :
 
 Nombre d’apnées / hypopnées / RERA : 
 
- apnées :0
+ apnées :241
 
- hypopnées :0
+ hypopnées :58
 
- RERA :0
+ RERA :7
 
 ============================================
 
 IAH : 
 
- IAH:0
+ IAH:41.00
 
