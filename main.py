@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import csv
 from pathlib import Path
+import sqlite3
 
 
 
@@ -137,6 +138,8 @@ cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, dur
 cnx.commit()
 
 
+
+
 #-----------------------------------------------------
 #-------- COURBES --------------- --------------------
 
@@ -201,7 +204,7 @@ plt.close()
 cur = cnx.cursor()
 
 requete = """
-SELECT nb_apnees, nb_hypopnees, nb_rera,iah
+SELECT nb_apnees, nb_hypopnees, nb_rera,iah,nb_microeveils,duree_hypoxie_min
 FROM resultat_nuit
 WHERE id_nuit = %s
 """
@@ -214,11 +217,15 @@ if result:
     nb_hypopnees = result[1]
     nb_rera = result[2]
     iah = result[3]
+    nb_microeveils = result[4]
+    duree_hypoxie_min = result[5]
 else:
     nb_apnees = 0
     nb_hypopnees = 0
     nb_rera = 0
     iah = 0
+    nb_microeveils=0
+    duree_hypoxie_min=0
 
 
 with open(dossier / f"rapport_medical_{id_nuit}.txt", "w", encoding="utf-8") as f:
@@ -252,3 +259,76 @@ with open(dossier / f"rapport_medical_{id_nuit}.txt", "w", encoding="utf-8") as 
     f.write(f" IAH:{iah}\n\n")
     
     print(f"Rapport Medical généré dans 'rapport_medical.txt'.")
+
+#
+#-----------------------------------------------------
+#--------  Création du datalake --------------- --------------------
+cnx_sqlite = sqlite3.connect("datalake.db")
+cursqlite = cnx_sqlite.cursor()
+cursqlite.execute("CREATE TABLE IF NOT EXISTS raw_capteur (id_raw INTEGER PRIMARY KEY AUTOINCREMENT,id_nuit  INTEGER NOT NULL,timestamp_sec INTEGER NOT NULL,spo2 REAL,debitnasalpct REAL,effortthoraciquepct REAL,position TEXT,ronflements_db REAL,flagevenement INTEGER CHECK (flagevenement IN (0,1)))")
+cursqlite.execute("CREATE TABLE IF NOT EXISTS curated_nuit (id_curated INTEGER PRIMARY KEY AUTOINCREMENT,id_nuit INTEGER NOT NULL,spo2_min REAL,spo2_moy REAL,spo2_mediane REAL,nb_apnees INTEGER,nb_hypopnees INTEGER,nb_rera INTEGER,nb_microeveils INTEGER,dureehypoxiemin REAL,position_dominante TEXT,decibels_max REAL,decibels_moy REAL,nbronflementsforts INTEGER)")
+for _, row in df.iterrows():
+    cursqlite.execute(
+        """
+        INSERT INTO raw_capteur (
+            id_nuit,
+            timestamp_sec,
+            spo2,
+            debitnasalpct,
+            effortthoraciquepct,
+            position,
+            ronflements_db,
+            flagevenement
+        )
+        VALUES (?,?,?,?,?,?,?,?)
+        """,
+        (
+            id_nuit,
+            row["timestamp_sec"],
+            row["spo2"],
+            row["debit_nasal_pct"],
+            row["effort_thoracique_pct"],
+            row["position"],
+            row["ronflements_db"],
+            row["flag_evenement"]
+        )
+    )
+
+# cursqlite.execute("INSERT INTO curated_nuit (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,
+# nb_hypopnees,nb_rera,nb_microeveils,dureehypoxiemin,position_dominante,decibels_max,decibels_moy,nbronflementsforts) VALUES (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,nb_hypopnees,nb_rera,nb_microeveils,duree_hypoxie_min,position_dominante,decibels_max,decibels_moy,nbr_ronflements_forts)")
+
+cursqlite.execute("""
+    INSERT INTO curated_nuit (
+        id_nuit,
+        spo2_min,
+        spo2_moy,
+        spo2_mediane,
+        nb_apnees,
+        nb_hypopnees,
+        nb_rera,
+        nb_microeveils,
+        dureehypoxiemin,
+        position_dominante,
+        decibels_max,
+        decibels_moy,
+        nbronflementsforts
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+""", (
+    id_nuit,
+    spo2_min,
+    spo2_moy,
+    spo2_mediane,
+    nb_apnees,
+    nb_hypopnees,
+    nb_rera,
+    nb_microeveils,
+    duree_hypoxie_min,
+    position_dominante,
+    decibels_max,
+    decibels_moy,
+    nbr_ronflements_forts
+))
+
+
+cnx_sqlite.commit()

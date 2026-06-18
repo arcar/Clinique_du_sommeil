@@ -1,6 +1,5 @@
 datalake.db
 __pycache__/
 .env
-
 nuits/
 raw/traite/
