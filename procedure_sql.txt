@@ -25,8 +25,8 @@ BEGIN
     duree_sommeil_min,
     duree_hypoxie_min,
     position_dominante,
-    (SELECT avg(duree_sec) as duree_apnee_moy_sec from evenement_respiratoire where (type_evenement = 'apnée obstructive' OR type_evenement = 'apnée centrale') AND id_nuit = nuit),
-    (SELECT max(duree_sec) as duree_apnee_max_sec from evenement_respiratoire where (type_evenement = 'apnée obstructive' OR type_evenement = 'apnée centrale') AND id_nuit = nuit),
+    (SELECT avg(duree_sec) as duree_apnee_moy_sec from evenement_respiratoire where id_nuit = nuit),
+    (SELECT max(duree_sec) as duree_apnee_max_sec from evenement_respiratoire where id_nuit = nuit),
     decibels_max,
     decibels_moy,
     nb_ronflements_forts);

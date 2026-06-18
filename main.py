@@ -131,17 +131,17 @@ new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
 
 
-#Charger les résultats_nuit dans SQL
+
+# # Charger les résultats_nuit dans SQL
 cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
 cnx.commit()
-
 
 
 #-----------------------------------------------------
 #-------- COURBES --------------- --------------------
 
 # Dossier de destination
-dossier = Path(f"nuit/{id_nuit}")
+dossier = Path(f"nuits/{id_nuit}")
 
 # Création du dossier et des sous-dossiers si nécessaire
 dossier.mkdir(parents=True, exist_ok=True)
@@ -157,6 +157,7 @@ with open("./raw/"+fichier, encoding="utf-8") as f:
         debit.append(float(row["debit_nasal_pct"]))
         ronflement_db.append(float(row["ronflements_db"]))
         spo2.append(float(row["spo2"]))
+
 
 heures = list(range(len(debit)))
 plt.plot(heures, debit, marker='o')
@@ -251,5 +252,3 @@ with open(dossier / f"rapport_medical_{id_nuit}.txt", "w", encoding="utf-8") as 
     f.write(f" IAH:{iah}\n\n")
     
     print(f"Rapport Medical généré dans 'rapport_medical.txt'.")
-
-    
