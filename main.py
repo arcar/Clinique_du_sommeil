@@ -3,18 +3,13 @@ import mysql.connector
 from dotenv import load_dotenv
 import os
 
-#-----------------------------------------------------
-#-------- DUREE SOMMEIL MINUTES ----------------------
-
-# ICI on crée une variable pour indiquer la durée du sommeil en fonction des notes techniques
-duree_sommeil_min = 420
 
 
 #-----------------------------------------------------
 #-------- LECTURE FICHIER CSV-------------------------
 
 # Pour choisir le csv a charger en fonction de l'id_nuit
-id_nuit = 2
+id_nuit = input("Entrez l'id_nuit du fichier à charger : ")
 
 for fichier in os.listdir("./raw/"):
     if fichier.endswith(f"-{id_nuit}.csv"):
@@ -22,6 +17,13 @@ for fichier in os.listdir("./raw/"):
         break
 else :
     print("Aucun fichier trouvé")
+
+#-----------------------------------------------------
+#-------- DUREE SOMMEIL MINUTES ----------------------
+
+# ICI on crée une variable pour indiquer la durée du sommeil en fonction des notes techniques
+duree_sommeil_min =  int(input("Entrez durée du sommeil en minutes : "))
+
 
 
 #-----------------------------------------------------
