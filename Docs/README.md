@@ -11,7 +11,7 @@
 # utilité du projet
 le projet va servir a le connecter à une application front end(html/css/js) et back end(node.js/express.js)pour permettre au medecin de charger des rapport ainsi que des courbes sur des résultat d'analyse et ainsi implémenter les données nettoyer sur une IA disponible publiquement (TensorFlow)
 
-# Prise en main du projet par les utilisateurs
+# contribution équipe
 Cedric = [Extraction - Lire le CSV capteur depuis un répertoire raw/]-[Transformation - Extrapolation sur la nuit complète] - [Livrables - Courbe à générer - Courbe débit nasal vs temps]
 
 flora = [Transformation - Depuis le CSV - Décibels maximum et moyenne]- [Transformation - Depuis evenement_respiratoire -Nb d'apnées, hypopnées, RERA et évènements] - [calcul IAH et diag SAHOS] - [Livrables - Courbe à générer -  Courbe ronflements db vs temps]
