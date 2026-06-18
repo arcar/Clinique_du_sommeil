@@ -1,8 +1,5 @@
-#importation de l'objet cnx dans main.py
-import statistics as stats
-
 import pandas as pd
-# pour eviter le push des mdp sur git
+import mysql.connector
 from dotenv import load_dotenv
 import os
 import pandas as pd
@@ -12,21 +9,28 @@ import pandas as pd
 #-----------------------------------------------------
 #-------- LECTURE FICHIER CSV-------------------------
 
-fileToRead = "./raw/signal-psg-patient-2-nuit-2.csv"
+# Pour choisir le csv a charger en fonction de l'id_nuit
+id_nuit = input("Entrez l'id_nuit du fichier à charger : ")
 
-# Lire le CSV capteur patient
-df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
+for fichier in os.listdir("./raw/"):
+    if fichier.endswith(f"-{id_nuit}.csv"):
+        df = pd.read_csv("./raw/"+fichier)
+        break
+else :
+    print("Aucun fichier trouvé")
+
+#-----------------------------------------------------
+#-------- DUREE SOMMEIL MINUTES ----------------------
+
+# ICI on crée une variable pour indiquer la durée du sommeil en fonction des notes techniques
+duree_sommeil_min =  int(input("Entrez durée du sommeil en minutes : "))
+
+
 
 #-----------------------------------------------------
 #-------- LECTURE SQL---------------------------------
 
-#connexion bdd
-import mysql.connector
-
-
 load_dotenv()
-
-
 
 # connexion bdd clinique
 cnx = mysql.connector.connect(
@@ -36,8 +40,7 @@ cnx = mysql.connector.connect(
     database=os.getenv("DB_NAME")
 )
 
-
-print("connexion réussi !")
+print("Connexion réussie !")
 
 #création d'une requête pour tester la connexion
 cur = cnx.cursor()
@@ -48,14 +51,6 @@ cur.execute(query)
 result = cur.fetchall()
 for f in result:
     print(f)
-
-
-
-
-
-
-
-
 
 
 
@@ -125,7 +120,7 @@ print(position_dominante)
 # new_nb_hypopnees =
 # new_nb_rera =
 # new_nb_microreveils =
-new_duree_hypoxie = round((nbr_secondes*7)/60, 1)
-new_nb_ronflements_forts = nbr_ronflements_forts*7
+new_duree_hypoxie = round(((nbr_secondes/60)*duree_sommeil_min)/60, 1)
+new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 
 print(new_nb_ronflements_forts)
