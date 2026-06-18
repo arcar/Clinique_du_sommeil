@@ -1,32 +1,55 @@
 import pandas as pd
-from ConnexionBdd import cnx
+import mysql.connector
+from dotenv import load_dotenv
+import os
+import pandas as pd
+
+#-----------------------------------------------------
+#-------- DUREE SOMMEIL MINUTES ----------------------
+
+# ICI on crée une variable pour indiquer la durée du sommeil en fonction des notes techniques
+duree_sommeil_min = 436
 
 
 #-----------------------------------------------------
 #-------- LECTURE FICHIER CSV-------------------------
 
-fileToRead = "./raw/signal-psg-patient-2-nuit-2.csv"
+# Pour choisir le csv a charger en fonction de l'id_nuit
+id_nuit = 1
 
-# Lire le CSV capteur patient
-df = pd.read_csv(fileToRead, sep=",", encoding="utf-8-sig")
+for fichier in os.listdir("./raw/"):
+    if fichier.endswith(f"-{id_nuit}.csv"):
+        df = pd.read_csv("./raw/"+fichier)
+        break
+else :
+    print("Aucun fichier trouvé")
+
 
 #-----------------------------------------------------
 #-------- LECTURE SQL---------------------------------
 
-#connexion bdd
-bdd = cnx
+load_dotenv()
 
-print("connexion réussi !")
+# connexion bdd clinique
+cnx = mysql.connector.connect(
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
+)
+
+print("Connexion réussie !")
 
 #création d'une requête pour tester la connexion
 cur = cnx.cursor()
-query = "select * from appareil"
+query = "SELECT * FROM evenement_respiratoire where id_nuit = 1"
 
 #éxecution de la requête
 cur.execute(query)
 result = cur.fetchall()
 for f in result:
     print(f)
+
 
 
 #-----------------------------------------------------
@@ -66,6 +89,8 @@ print(f"spo2_min :{spo2_min}")
 print(f"spo2_moy :{spo2_moy}")
 print(f"spo2_mediane :{spo2_mediane}")
 
+
+
 # Compter le nombre de secondes où spo2 < 90 - Chaque ligne 10 secondes 
 nbr_secondes = len(df.loc[df['spo2'] < 90]) * 10
 print(f"le nombre de secondes où spo2 < 90 : {nbr_secondes}")
@@ -90,4 +115,22 @@ print(df)
 
 
 
-#df.to_csv("./raw/traite_signal-psg-patient-2-nuit-2.csv.csv", sep=",", index=False, encoding="utf-8-sig")
+print(position_dominante)
+
+
+
+#-----------------------------------------------------
+#-------- EXTRAPOLATION RESULTATS --------------------
+
+# new_nb_apnees = 
+# new_nb_hypopnees =
+# new_nb_rera =
+# new_nb_microreveils =
+new_duree_hypoxie = round(((nbr_secondes/60)*duree_sommeil_min)/60, 1)
+new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
+
+print(new_nb_ronflements_forts)
+
+# Copier le CSV brut dans /raw/traite/
+df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
+
