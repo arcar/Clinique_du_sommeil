@@ -3,6 +3,9 @@ import mysql.connector
 import sqlite3
 from dotenv import load_dotenv
 import os
+import matplotlib.pyplot as plt
+import csv
+from pathlib import Path
 
 
 
@@ -49,8 +52,7 @@ query = "SELECT * FROM evenement_respiratoire where id_nuit = 1"
 #éxecution de la requête
 cur.execute(query)
 result = cur.fetchall()
-for f in result:
-    print(f)
+
 
 
 
@@ -87,20 +89,18 @@ spo2_moy = round(df.loc[:,'spo2'].mean(),1)
 spo2_mediane = round(df.loc[:,'spo2'].median(),1)
 
 
-print(f"spo2_min :{spo2_min}")
-print(f"spo2_moy :{spo2_moy}")
-print(f"spo2_mediane :{spo2_mediane}")
+
 
 
 
 # Compter le nombre de secondes où spo2 < 90 - Chaque ligne 10 secondes 
 nbr_secondes = len(df.loc[df['spo2'] < 90]) * 10
-print(f"le nombre de secondes où spo2 < 90 : {nbr_secondes}")
+
 
 # Calcul du nombre de ronflement fort 
 df["ronflements_db"] = pd.to_numeric(df["ronflements_db"],errors="coerce")
 nbr_ronflements_forts = len(df.loc[df["ronflements_db"]>70])
-print(f"Nombre de ronflements forts : { nbr_ronflements_forts}")
+
 
 # Calcul de la position dominante
 
@@ -109,15 +109,15 @@ position_dominante = df['position'].value_counts()
 # label de max value
 position_dominante = position_dominante[position_dominante == max(position_dominante)].index.tolist()[0]
 
-print(f"Position dominante : {position_dominante}")
+
 
 nb_doublons = df.duplicated().sum()
 
-print(df)
 
 
 
-print(position_dominante)
+
+
 
 
 #-----------------------------------------------------
@@ -126,13 +126,78 @@ print(position_dominante)
 new_duree_hypoxie = round(((nbr_secondes/60)*duree_sommeil_min)/60, 1)
 new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 
-print(new_nb_ronflements_forts)
+
 
 # Copier le CSV brut dans /raw/traite/
 df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
 
 
 # Charger les résultats_nuit dans SQL
+# cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
+# cnx.commit()
+
+#-----------------------------------------------------
+#-------- Rapport Medical --------------------
+
+cur = cnx.cursor()
+
+requete = """
+SELECT nb_apnees, nb_hypopnees, nb_rera,iah,nb_microeveils,duree_hypoxie_min
+FROM resultat_nuit
+WHERE id_nuit = %s
+"""
+
+cur.execute(requete, (id_nuit,))
+result = cur.fetchone()
+
+if result:
+    nb_apnees = result[0]
+    nb_hypopnees = result[1]
+    nb_rera = result[2]
+    iah = result[3]
+    nb_microeveils = result[4]
+    duree_hypoxie_min = result[5]
+else:
+    nb_apnees = 0
+    nb_hypopnees = 0
+    nb_rera = 0
+    iah = 0
+    nb_microeveils=0
+    duree_hypoxie_min=0
+
+with open("rapport_medical.txt", "w", encoding="utf-8") as f:
+    f.write("=== Rapport médical pour le Medecin ===\n\n")
+    
+    f.write("============================================\n")
+    f.write(f"=== Nuit : {id_nuit} ===\n\n")
+    f.write("Spo2 min/moy/max: \n\n")
+    f.write(f"minimum :{spo2_min}\n\n")
+    f.write(f"moyen :{spo2_moy}\n\n")
+    f.write(f"mediane :{spo2_mediane}\n\n")
+    f.write("============================================\n\n")
+    f.write("Ronflement fort (>70dB): \n\n")
+    f.write(f"{new_nb_ronflements_forts}\n\n")
+    f.write("intensité des ronflements : \n\n")
+    f.write(f" MAX : {decibels_max} \n\n")
+    f.write(f" MOYEN : {decibels_moy}n\n")
+    f.write("============================================\n\n")
+    f.write("Duree Hypoxie : \n\n")
+    f.write(f"{new_duree_hypoxie} min\n\n")
+    f.write("============================================\n\n")
+    f.write("Position Dominante : \n\n")
+    f.write(f" {position_dominante}\n\n")
+    f.write("============================================\n\n")
+    f.write("Nombre d’apnées / hypopnées / RERA : \n\n")
+    f.write(f" apnées :{nb_apnees}\n\n")
+    f.write(f" hypopnées :{nb_hypopnees}\n\n")
+    f.write(f" RERA :{nb_rera}\n\n")
+    f.write("============================================\n\n")
+    f.write("IAH : \n\n")
+    f.write(f" IAH:{iah}\n\n")
+    
+    print(f"Rapport Medical généré dans 'rapport_medical.txt'.")
+
+    
 cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
 cnx.commit()
 
@@ -172,12 +237,68 @@ for _, row in df.iterrows():
         )
     )
 
+# cursqlite.execute("INSERT INTO curated_nuit (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,
+# nb_hypopnees,nb_rera,nb_microeveils,dureehypoxiemin,position_dominante,decibels_max,decibels_moy,nbronflementsforts) VALUES (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,nb_hypopnees,nb_rera,nb_microeveils,duree_hypoxie_min,position_dominante,decibels_max,decibels_moy,nbr_ronflements_forts)")
+
+cursqlite.execute("""
+    INSERT INTO curated_nuit (
+        id_nuit,
+        spo2_min,
+        spo2_moy,
+        spo2_mediane,
+        nb_apnees,
+        nb_hypopnees,
+        nb_rera,
+        nb_microeveils,
+        dureehypoxiemin,
+        position_dominante,
+        decibels_max,
+        decibels_moy,
+        nbronflementsforts
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+""", (
+    id_nuit,
+    spo2_min,
+    spo2_moy,
+    spo2_mediane,
+    nb_apnees,
+    nb_hypopnees,
+    nb_rera,
+    nb_microeveils,
+    duree_hypoxie_min,
+    position_dominante,
+    decibels_max,
+    decibels_moy,
+    nbr_ronflements_forts
+))
 
 
-
-
-cursqlite.execute("INSERT INTO curated_nuit (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,nb_hypopnees,nb_rera,nb_microeveils,dureehypoxiemin,position_dominante,decibels_max,decibels_moy,nbronflementsforts) VALUES (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,nb_hypopnees,nb_rera,nb_microeveils,duree_hypoxie_min,position_dominante,decibels_max,decibels_moy,nbr_ronflements_forts)")
 cnx_sqlite.commit()
 
 
 
+#-----------------------------------------------------
+#-------- COURBES --------------- --------------------
+
+# Dossier de destination
+dossier = Path(f"nuit/{id_nuit}")
+
+# Création du dossier et des sous-dossiers si nécessaire
+dossier.mkdir(parents=True, exist_ok=True)
+
+# Générer une courbe PNG et PDF pour debit nasal
+# Objectif : visualiser les données.
+debit = []
+with open("./raw/"+fichier, encoding="utf-8") as f:
+    reader = csv.DictReader(f, delimiter=',')
+    for row in reader:
+        debit.append(float(row["debit_nasal_pct"]))
+heures = list(range(len(debit)))
+plt.plot(heures, debit, marker='o')
+plt.xlabel("/10 secondes")
+plt.ylabel("Débit nasal")
+plt.title("Évolution du débit nasal sur une heure par tranche de 10 secondes")
+plt.grid(True)
+plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.png")
+plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.pdf")

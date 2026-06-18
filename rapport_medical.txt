@@ -1,0 +1,52 @@
+=== Rapport médical pour le Medecin ===
+
+============================================
+=== Nuit : 1 ===
+
+Spo2 min/moy/max: 
+
+minimum :74.0
+
+moyen :91.4
+
+mediane :94.4
+
+============================================
+
+Ronflement fort (>70dB): 
+
+781
+
+intensité des ronflements : 
+
+ MAX : 79.0 
+
+ MOYEN : 61.785555555555554n
+============================================
+
+Duree Hypoxie : 
+
+110.7 min
+
+============================================
+
+Position Dominante : 
+
+ dorsale
+
+============================================
+
+Nombre d’apnées / hypopnées / RERA : 
+
+ apnées :0
+
+ hypopnées :0
+
+ RERA :0
+
+============================================
+
+IAH : 
+
+ IAH:0
+
