@@ -164,7 +164,7 @@ CREATE TABLE `comorbidite` (
 
 LOCK TABLES `comorbidite` WRITE;
 /*!40000 ALTER TABLE `comorbidite` DISABLE KEYS */;
-INSERT INTO `comorbidite` VALUES (1,'Hypertension artérielle (HTA)','cardiovasculaire'),(2,'Diabète de type 2','métabolique'),(3,'Obésité','métabolique'),(4,'Insuffisance cardiaque','cardiovasculaire'),(5,'Fibrillation auriculaire','cardiovasculaire'),(6,'BPCO','respiratoire'),(7,'Asthme','respiratoire'),(8,'HypothyroÃ¯die','métabolique'),(9,'Dépression','psychiatrique'),(10,'Anxiété','psychiatrique'),(11,'Reflux gastro-oesophagien (RGO)','autre'),(12,'Syndrome métabolique','métabolique'),(13,'Insuffisance rénale chronique','autre'),(14,'Dyslipidémie','métabolique'),(15,'Accident vasculaire cérébral (AVC)','cardiovasculaire');
+INSERT INTO `comorbidite` VALUES (1,'Hypertension artérielle (HTA)','cardiovasculaire'),(2,'Diabète de type 2','métabolique'),(3,'Obésité','métabolique'),(4,'Insuffisance cardiaque','cardiovasculaire'),(5,'Fibrillation auriculaire','cardiovasculaire'),(6,'BPCO','respiratoire'),(7,'Asthme','respiratoire'),(8,'Hypothyroïdie','métabolique'),(9,'Dépression','psychiatrique'),(10,'Anxiété','psychiatrique'),(11,'Reflux gastro-oesophagien (RGO)','autre'),(12,'Syndrome métabolique','métabolique'),(13,'Insuffisance rénale chronique','autre'),(14,'Dyslipidémie','métabolique'),(15,'Accident vasculaire cérébral (AVC)','cardiovasculaire');
 /*!40000 ALTER TABLE `comorbidite` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,7 +196,7 @@ CREATE TABLE `consultation` (
 
 LOCK TABLES `consultation` WRITE;
 /*!40000 ALTER TABLE `consultation` DISABLE KEYS */;
-INSERT INTO `consultation` VALUES (1,1,1,'2024-09-15','Ronflements sévères, apnées observées par conjointe, somnolence au volant','Homme 56 ans, maÃ§on. IMC 35.8. Fumeur 15 PA. HTA sous traitement. Epworth 17/24. Tension 148/94. Suspicion SAHOS sévère. Risque professionnel conduite engins. PSG complet prescrit en urgence relative.'),(2,1,1,'2024-10-08','Bilan pré-PSG :” suivi clinique jour J','Patient revu en consultation le jour de la nuit d étude. Tension 146/92. Poids 99.4kg. Somnolence diurne persistante. Pas de contre-indication. Installation PSG prévue Ã  21h00.'),(3,2,2,'2024-10-10','Fatigue chronique, ronflements occasionnels, céphalées matinales','Femme 44 ans, comptable. IMC 27.4. Non fumeuse. Anxiété traitée. Epworth 9/24. RGO connu. Fatigue matinale invalidante. Polygraphie ambulatoire prescrite pour éliminer SAHOS.'),(4,2,2,'2024-11-05','Bilan pré-polygraphie :” suivi clinique jour J','Patiente revue en consultation le jour de l enregistrement. Poids 72.8kg. Tension 118/74. Pas de contre-indication. Installation polygraphie prévue Ã  22h00.');
+INSERT INTO `consultation` VALUES (1,1,1,'2024-09-15','Ronflements sévères, apnées observées par conjointe, somnolence au volant','Homme 56 ans, maçon. IMC 35.8. Fumeur 15 PA. HTA sous traitement. Epworth 17/24. Tension 148/94. Suspicion SAHOS sévère. Risque professionnel conduite engins. PSG complet prescrit en urgence relative.'),(2,1,1,'2024-10-08','Bilan pré-PSG — suivi clinique jour J','Patient revu en consultation le jour de la nuit d étude. Tension 146/92. Poids 99.4kg. Somnolence diurne persistante. Pas de contre-indication. Installation PSG prévue à 21h00.'),(3,2,2,'2024-10-10','Fatigue chronique, ronflements occasionnels, céphalées matinales','Femme 44 ans, comptable. IMC 27.4. Non fumeuse. Anxiété traitée. Epworth 9/24. RGO connu. Fatigue matinale invalidante. Polygraphie ambulatoire prescrite pour éliminer SAHOS.'),(4,2,2,'2024-11-05','Bilan pré-polygraphie — suivi clinique jour J','Patiente revue en consultation le jour de l enregistrement. Poids 72.8kg. Tension 118/74. Pas de contre-indication. Installation polygraphie prévue à 22h00.');
 /*!40000 ALTER TABLE `consultation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -357,7 +357,7 @@ CREATE TABLE `nuit_etude` (
 
 LOCK TABLES `nuit_etude` WRITE;
 /*!40000 ALTER TABLE `nuit_etude` DISABLE KEYS */;
-INSERT INTO `nuit_etude` VALUES (1,1,8,1,1,'2024-10-08','polysomnographie','Installation 21h00. Patient coopérant malgré appréhension. Calibration capteurs 21h45. Endormissement 22h12. Ronflements très intenses dès onset sommeil. Recalibration SpO2 Ã  01h30. Réveil naturel 06h28. Signal complet 7h16 exploitable. Fichier brut : signal_psg_patient_severe.csv'),(2,2,9,2,4,'2024-11-05','polygraphie','Enregistrement ambulatoire posé en consultation Ã  17h30. Patiente rentrée Ã  domicile. Démarrage automatique 22h00. Latence endormissement estimée 38 min. Signal de bonne qualité. Retour appareil le lendemain matin. Fichier brut : signal_psg_patient_leger.csv');
+INSERT INTO `nuit_etude` VALUES (1,1,8,1,1,'2024-10-08','polysomnographie','Installation 21h00. Patient coopérant malgré appréhension. Calibration capteurs 21h45. Endormissement 22h12. Ronflements très intenses dès onset sommeil. Recalibration SpO2 à 01h30. Réveil naturel 06h28. Signal complet 7h16 exploitable. Fichier brut : signal_psg_patient_severe.csv'),(2,2,9,2,4,'2024-11-05','polygraphie','Enregistrement ambulatoire posé en consultation à 17h30. Patiente rentrée à domicile. Démarrage automatique 22h00. Latence endormissement estimée 38 min. Signal de bonne qualité. Retour appareil le lendemain matin. Fichier brut : signal_psg_patient_leger.csv');
 /*!40000 ALTER TABLE `nuit_etude` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -398,7 +398,7 @@ CREATE TABLE `patient` (
 
 LOCK TABLES `patient` WRITE;
 /*!40000 ALTER TABLE `patient` DISABLE KEYS */;
-INSERT INTO `patient` VALUES (1,'Tessier','Bernard','1968-07-15','M','3 rue des Tonneliers, Arles','0611445588','bernard.tessier@gmail.com','1 68 07 13 058 114',35.8,1,15,'occasionnelle','MaÃ§on','modéré','2024-09-10',1),(2,'Vernet','Isabelle','1980-03-28','F','14 allée des Platanes, Tarascon','0622556699','isabelle.vernet@sfr.fr','2 80 03 13 142 225',27.4,0,0,'aucune','Comptable','modéré','2024-10-05',1);
+INSERT INTO `patient` VALUES (1,'Tessier','Bernard','1968-07-15','M','3 rue des Tonneliers, Arles','0611445588','bernard.tessier@gmail.com','1 68 07 13 058 114',35.8,1,15,'occasionnelle','Maçon','modéré','2024-09-10',1),(2,'Vernet','Isabelle','1980-03-28','F','14 allée des Platanes, Tarascon','0622556699','isabelle.vernet@sfr.fr','2 80 03 13 142 225',27.4,0,0,'aucune','Comptable','modéré','2024-10-05',1);
 /*!40000 ALTER TABLE `patient` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -488,7 +488,7 @@ CREATE TABLE `prescription_nuit` (
 
 LOCK TABLES `prescription_nuit` WRITE;
 /*!40000 ALTER TABLE `prescription_nuit` DISABLE KEYS */;
-INSERT INTO `prescription_nuit` VALUES (1,2,1,'Suspicion SAHOS sévère :” risque professionnel conduite','urgente'),(2,4,2,'Suspicion SAHOS léger :” fatigue chronique invalidante','normale');
+INSERT INTO `prescription_nuit` VALUES (1,2,1,'Suspicion SAHOS sévère — risque professionnel conduite','urgente'),(2,4,2,'Suspicion SAHOS léger — fatigue chronique invalidante','normale');
 /*!40000 ALTER TABLE `prescription_nuit` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -504,7 +504,7 @@ CREATE TABLE `resultat_nuit` (
   `id_nuit` int NOT NULL,
   `id_medecin_validateur` int NOT NULL,
   `date_validation` date NOT NULL,
-  `iah` decimal(5,2) DEFAULT NULL COMMENT 'Index Apnée-Hypopnée :” événements/heure',
+  `iah` decimal(5,2) DEFAULT NULL COMMENT 'Index Apnée-Hypopnée — événements/heure',
   `spo2_min` decimal(5,2) DEFAULT NULL,
   `spo2_moy` decimal(5,2) DEFAULT NULL,
   `spo2_mediane` decimal(5,2) DEFAULT NULL,
