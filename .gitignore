@@ -3,3 +3,5 @@ __pycache__/
 .env
 nuits/
 raw/traite/
+node_modules/
+CliniquePlus.db
