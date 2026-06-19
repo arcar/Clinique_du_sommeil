@@ -54,8 +54,6 @@ cur.execute(query)
 result = cur.fetchall()
 
 
-
-
 #-----------------------------------------------------
 #-------- CALCUL INDICATEURS -------------------------
 
@@ -89,10 +87,6 @@ spo2_moy = round(df.loc[:,'spo2'].mean(),1)
 spo2_mediane = round(df.loc[:,'spo2'].median(),1)
 
 
-
-
-
-
 # Compter le nombre de secondes où spo2 < 90 - Chaque ligne 10 secondes 
 nbr_secondes = len(df.loc[df['spo2'] < 90]) * 10
 
@@ -110,14 +104,7 @@ position_dominante = df['position'].value_counts()
 position_dominante = position_dominante[position_dominante == max(position_dominante)].index.tolist()[0]
 
 
-
 nb_doublons = df.duplicated().sum()
-
-
-
-
-
-
 
 
 #-----------------------------------------------------
@@ -126,16 +113,12 @@ nb_doublons = df.duplicated().sum()
 new_duree_hypoxie = round(((nbr_secondes/60)*duree_sommeil_min)/60, 1)
 new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 
-
-
 # Copier le CSV brut dans /raw/traite/
 df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
 
-
-
 # # Charger les résultats_nuit dans SQL
-# cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
-# cnx.commit()
+cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
+cnx.commit()
 
 #-----------------------------------------------------
 #--------  Surlignage --------------- -------
@@ -183,7 +166,7 @@ print(intervalles_detectes)
 
 
 #-----------------------------------------------------
-#-------- COURBES --------------- --------------------
+#-------- COURBES ------------------------------------
 
 # Dossier de destination
 dossier = Path(f"nuits/{id_nuit}")
@@ -208,9 +191,7 @@ heures = list(range(len(debit)))
 
 fig,ax = plt.subplots()
 for i in intervalles_detectes:
-
     ax.axvspan(i[0],i[1], facecolor ='green', alpha = 0.5)
-
 plt.plot(heures, debit, marker='')
 plt.xlabel("/10 secondes")
 plt.ylabel("Débit nasal")
@@ -222,7 +203,6 @@ plt.close()
 
 fig,ax2 = plt.subplots()
 for i in intervalles_detectes:
-
     ax2.axvspan(i[0],i[1], facecolor ='green', alpha = 0.5)
 plt.plot(heures, ronflement_db, marker='')
 plt.xlabel("/10 secondes")
@@ -235,7 +215,6 @@ plt.close()
 
 fig,ax3 = plt.subplots()
 for i in intervalles_detectes:
-
     ax3.axvspan(i[0],i[1], facecolor ='green', alpha = 0.5)
 plt.plot(heures, spo2, marker='')
 plt.xlabel("/10 secondes")
@@ -245,12 +224,6 @@ plt.grid(True)
 plt.savefig(dossier / f"spo2_{id_nuit}.png")
 plt.savefig(dossier / f"spo2_{id_nuit}.pdf")
 plt.close()
-
-
-
-
-
-
 
 
 #-----------------------------------------------------
@@ -315,7 +288,7 @@ with open(dossier / f"rapport_medical_{id_nuit}.txt", "w", encoding="utf-8") as 
     
     print(f"Rapport Medical généré dans 'rapport_medical.txt'.")
 
-#
+
 #-----------------------------------------------------
 #--------  Création du datalake --------------- --------------------
 cnx_sqlite = sqlite3.connect("datalake.db")
@@ -349,8 +322,6 @@ for _, row in df.iterrows():
         )
     )
 
-# cursqlite.execute("INSERT INTO curated_nuit (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,
-# nb_hypopnees,nb_rera,nb_microeveils,dureehypoxiemin,position_dominante,decibels_max,decibels_moy,nbronflementsforts) VALUES (id_nuit,spo2_min,spo2_moy,spo2_mediane,nb_apnees,nb_hypopnees,nb_rera,nb_microeveils,duree_hypoxie_min,position_dominante,decibels_max,decibels_moy,nbr_ronflements_forts)")
 
 cursqlite.execute("""
     INSERT INTO curated_nuit (
