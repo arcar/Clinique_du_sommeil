@@ -1,7 +1,10 @@
+
 datalake.db
 __pycache__/
 .env
 nuits/
 raw/traite/
-node_modules/
+
+#js
+NodeJS/node_modules/
 CliniquePlus.db
