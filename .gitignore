@@ -5,6 +5,3 @@ __pycache__/
 nuits/
 raw/traite/
 
-#js
-NodeJS/node_modules/
-CliniquePlus.db
