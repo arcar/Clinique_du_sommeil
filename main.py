@@ -134,10 +134,52 @@ df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",
 
 
 # # Charger les résultats_nuit dans SQL
-cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
-cnx.commit()
+# cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
+# cnx.commit()
+
+#-----------------------------------------------------
+#--------  Surlignage --------------- -------
 
 
+temps_debut = None
+intervalles_detectes = []
+
+for index, row in df.iterrows():
+        flag = row['flag_evenement']
+        timestamp = row['timestamp_sec']
+
+        # Gérer les cas où la valeur FLAG est manquante ou non numérique
+        if pd.isna(flag):
+            continue
+            
+        # Assurez-vous que le flag est bien un entier pour la comparaison
+        try:
+            flag_int = int(flag)
+            timestamp_int = int(timestamp)
+        except ValueError:
+             # Si on ne peut pas convertir en entier, on ignore cette ligne
+            continue
+
+        if flag_int == 1:
+            # Détection du début (Transition 0 -> 1 ou 1 -> 1)
+            # On enregistre le temps si nous n'en avons pas encore.
+            if temps_debut is None:
+                temps_debut = timestamp_int/10
+               
+        elif flag_int == 0:
+            # Détection de la fin (Transition 1 -> 0)
+            if temps_debut is not None:
+                temps_fin = (timestamp_int - 10)/10
+                intervalle = (temps_debut, temps_fin)
+                intervalles_detectes.append(intervalle)
+                                
+                # Réinitialiser l'état
+                temps_debut = None 
+            else:
+                # On trouve un '0', mais le début était soit absent, soit déjà traité.
+                pass
+
+print(intervalles_detectes)
 
 
 #-----------------------------------------------------
@@ -163,7 +205,13 @@ with open("./raw/"+fichier, encoding="utf-8") as f:
 
 
 heures = list(range(len(debit)))
-plt.plot(heures, debit, marker='o')
+
+fig,ax = plt.subplots()
+for i in intervalles_detectes:
+
+    ax.axvspan(i[0],i[1], facecolor ='green', alpha = 0.5)
+
+plt.plot(heures, debit, marker='')
 plt.xlabel("/10 secondes")
 plt.ylabel("Débit nasal")
 plt.title("Évolution du débit nasal sur une heure par tranche de 10 secondes")
@@ -172,8 +220,11 @@ plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.png")
 plt.savefig(dossier / f"debit_nasal_nuit_{id_nuit}.pdf")
 plt.close()
 
+fig,ax2 = plt.subplots()
+for i in intervalles_detectes:
 
-plt.plot(heures, ronflement_db, marker='o')
+    ax2.axvspan(i[0],i[1], facecolor ='green', alpha = 0.5)
+plt.plot(heures, ronflement_db, marker='')
 plt.xlabel("/10 secondes")
 plt.ylabel("Ronflement (dB)")
 plt.title("Évolution du ronflement sur une heure par tranche de 10 secondes")
@@ -182,7 +233,11 @@ plt.savefig(dossier / f"ronflement_db_{id_nuit}.png")
 plt.savefig(dossier / f"ronflement_db_{id_nuit}.pdf")
 plt.close()
 
-plt.plot(heures, spo2, marker='o')
+fig,ax3 = plt.subplots()
+for i in intervalles_detectes:
+
+    ax3.axvspan(i[0],i[1], facecolor ='green', alpha = 0.5)
+plt.plot(heures, spo2, marker='')
 plt.xlabel("/10 secondes")
 plt.ylabel("spo2")
 plt.title("Évolution du spo2 sur une heure par tranche de 10 secondes")
@@ -332,3 +387,7 @@ cursqlite.execute("""
 
 
 cnx_sqlite.commit()
+
+
+
+
