@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import csv
 from pathlib import Path
 import sqlite3
-
+import requests
 
 
 #-----------------------------------------------------
@@ -117,11 +117,36 @@ new_nb_ronflements_forts = round((nbr_ronflements_forts/60)*duree_sommeil_min)
 df.to_csv(f"./raw/traite/traite_signal-psg-patient-2-nuit-{id_nuit}.csv", sep=",", index=False, encoding="utf-8-sig")
 
 # # Charger les résultats_nuit dans SQL
-cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
-cnx.commit()
+#cur.callproc('insert_data_night',(id_nuit, spo2_min, spo2_moy, spo2_mediane, duree_sommeil_min, new_duree_hypoxie, position_dominante, decibels_max, decibels_moy, new_nb_ronflements_forts))
+#cnx.commit()
 
 #-----------------------------------------------------
-#--------  Surlignage --------------- -------
+#--------  Connexion a une API pour inserer dans la table resultat_nuit --------------- -------
+
+url = 'http://localhost:3000/resultat-nuit-ajout'
+data = {
+  "nuit":id_nuit,
+  "spo2_min":spo2_min, 
+  "spo2_moy":spo2_moy,
+  "spo2_mediane":spo2_mediane, 
+  "duree_sommeil_min":duree_sommeil_min,
+  "new_duree_hypoxie":new_duree_hypoxie,
+  "position_dominante":position_dominante,
+  "decibels_max":decibels_max,
+  "decibels_moy":decibels_moy,
+  "new_nb_ronflements_forts":new_nb_ronflements_forts
+}
+headers = {'Content-type': 'application/json'}
+
+response = requests.post(url, json=data, headers=headers)
+
+if response.status_code == 200:
+    print('Succes')
+else:
+    print('erreur.')
+
+#-----------------------------------------------------
+#--------  Surlignage --------------------------------
 
 
 temps_debut = None
